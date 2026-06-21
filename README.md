@@ -1,4 +1,4 @@
-# RowKeyDB — single-node beta
+# RowKeyDB — Single-Node Beta
 
 RowKeyDB is a database that speaks the Google Bigtable API and that you run on your own infrastructure, on any cloud or on bare metal. This repository holds its first single-node beta, built for testing and evaluation, together with the first benchmark numbers and the means to confirm that a download came from us.
 
