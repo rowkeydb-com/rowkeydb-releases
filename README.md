@@ -77,6 +77,30 @@ A56D 0CCF 7F9E 66BD F5E9  7CAF 54BD 1DFD F41B D841
 
 It is published here as [rowkeydb-signing-key.asc](rowkeydb-signing-key.asc), at [rowkeydb.com/security](https://rowkeydb.com/security), on the keyserver `keys.openpgp.org`, and on GitHub at `https://github.com/marete.gpg`. Check that the same forty characters appear in more than one of these before you trust a download. The source remains private during the beta.
 
+## HBase Compatibility and Conformance Testing
+
+RowKeyDB acts as a drop-in replacement for HBase applications migrating to the Bigtable API. To guarantee perfect compatibility, RowKeyDB flawlessly passes the official Google Cloud Bigtable HBase adapter integration suite (`googleapis/java-bigtable-hbase`). 
+
+You can run the official Google integration test suite against the downloaded RowKeyDB release binary yourself:
+
+```bash
+# 1. Start the downloaded RowKeyDB binary in the background
+# Replace /path/to/rowkeydb with the actual path to the extracted binary
+/path/to/rowkeydb --storage_backend=rocksdb --port=8888 --data_dir=/tmp/rowkeydb &
+
+# 2. Clone the official Google adapter repo
+git clone https://github.com/googleapis/java-bigtable-hbase.git
+cd java-bigtable-hbase
+
+# 3. Install adapter dependencies
+mvn -B install -DskipTests
+
+# 4. Run the integration test suite
+cd bigtable-hbase-2.x-parent/bigtable-hbase-2.x-integration-tests
+export BIGTABLE_EMULATOR_HOST=localhost:8888
+mvn -B verify -PemulatorTestsH2
+```
+
 ## What comes next
 
 Three pieces of work follow this release, in increasing order of size.
