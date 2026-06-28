@@ -58,6 +58,35 @@ The server sustains 10,000 durable writes a second at a ninety-ninth-percentile 
 
 RowKeyDB refuses work it cannot finish, early and cheaply, instead of accepting it and collapsing. This is done by [Limen](https://rowkeydb.com/limen), an open-source library, built in and on by default. When the read benchmark reached the disk's limit it shed three percent and kept answering the rest. Offered 14,000 writes a second, well past what the disk allows, it shed thirty-eight percent and stayed available. In neither case did it run out of memory, and in neither case did it crash.
 
+**Important:** Load shedding requires TLS to be enabled. It is turned on by default whenever TLS is active.
+
+#### 1. Generate Self-Signed Certificates
+
+To enable TLS for testing and evaluation, you can generate self-signed certificates using `openssl`. Run the following command in your terminal:
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -days 365 -nodes -subj "/CN=localhost"
+```
+
+This creates two files in your current directory:
+- `server.key`: The private key.
+- `server.crt`: The public certificate.
+
+#### 2. Start RowKeyDB with TLS
+
+Start RowKeyDB by providing the paths to the certificates you just generated using the `--tls_cert_file` and `--tls_key_file` flags:
+
+```bash
+/path/to/rowkeydb \
+  --tls_cert_file=server.crt \
+  --tls_key_file=server.key \
+  --storage_backend=rocksdb \
+  --port=8888 \
+  --data_dir=/tmp/rowkeydb
+```
+
+With these flags set, RowKeyDB will serve traffic securely over TLS, and the Limen load-shedding admission controller will automatically engage.
+
 ## Download and verify
 
 Binaries for x86-64 Linux are published under [Releases](https://github.com/rowkeydb-com/rowkeydb-releases/releases). This first beta is built for Ubuntu 24.04 and newer — that is, for any distribution carrying glibc 2.39 or later — and binaries that run on older systems will follow in due course. Every release is signed; before you run one, confirm it came from us:
